@@ -13,6 +13,7 @@ import javax.imageio.ImageIO;
 public class UpCharacterImage {
 
 	BufferedImage img;
+	String character;
 	int TILE_WIDTH = 138;
 	int TILE_HEIGHT = 138;
 	int STACK_HEIGHT=162;
@@ -25,7 +26,7 @@ public class UpCharacterImage {
 	 */
 	private void makeImage(String text, Font font, int xoffset, int yoffset)
 	{
-
+	 character = text;
      img = new BufferedImage(TILE_WIDTH, STACK_HEIGHT, BufferedImage.TYPE_INT_ARGB);
      Graphics2D g2d = img.createGraphics();
      g2d.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
@@ -50,16 +51,15 @@ public class UpCharacterImage {
 	 * Create the number representing the stack height of the tile.
 	 */
 	public UpCharacterImage(int number) {
-		number=5;
 		Font font = new Font("Apple Color Emoji", Font.PLAIN, 28);
 		String text = String.format("%d", number);
 		
 		// The stack height goes with the number, and the number is offset a bit for each level of stack.
-		int[] yoffsets = {0, 50, 42, 34, 26, 19};
-
-		// The number is far over to the right of the tile
-		int xoffset = 108;
-		makeImage(text, font, xoffset, 12 + yoffsets[number]);
+		// The image numbers are slightly offset to the left and right as well.
+		int[] yoffsets = {0, 51, 43, 35, 27, 19};
+		int[] xoffsets = {0, 100, 99, 99, 98, 99};
+		
+		makeImage(text, font, xoffsets[number], 12 + yoffsets[number]);
 	}
 	
 	/*

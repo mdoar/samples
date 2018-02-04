@@ -24,7 +24,7 @@ public class Upwords {
 		return(true);
 	}
 	
-	private static boolean compareTiles(BufferedImage created, BufferedImage sampled) {
+	private static boolean compareTiles(BufferedImage created, BufferedImage sampled, boolean logging) {
 		int cred, cgreen, cblue, sred, sgreen, sblue;
 		Color mycolor;
 		float createdBlack = 0; 
@@ -45,28 +45,28 @@ public class Upwords {
 				 */
 				if (numbersClose(cred, cgreen, cblue, COLOR_TOLERANCE) && (cred < BLACK_BREAKPOINT)) {
 					createdBlack += 1;
-					
-					/*
-					 * The sampled image is slightly offset
-					 */
-					mycolor = new Color(sampled.getRGB(x-9, y));
+
+					mycolor = new Color(sampled.getRGB(x, y));
 					sred = mycolor.getRed();
 					sgreen = mycolor.getGreen();
 					sblue = mycolor.getBlue();
 					
-					
-					String colorText = String.format("%d %d %d    %d %d %d", cred, cgreen, cblue, sred, sgreen, sblue);
-					System.out.println(colorText);
 					if (numbersClose(sred, sgreen, sblue, COLOR_TOLERANCE) && (sred < BLACK_BREAKPOINT)) {
 						bothBlack += 1;
 					}
 				}
 			}
 		}
-		System.out.println("Created black:" + createdBlack + "   bothBlack:" + bothBlack);
-		
-		return(true);
+		if (logging) {
+			System.out.println("createdBlack =" + createdBlack + "    bothBlack = " + bothBlack);
+		}
+	    // If 90% of points were both black we have a match
+		if (bothBlack/createdBlack > .8) {
+			return(true);
+		}
+		return(false);
 	}
+	
    public static void main(String[] args) {
 	 
 	   JFrame f = new JFrame("Load Image Sample");
@@ -80,15 +80,38 @@ public class Upwords {
 		   }
 	   });
 
-	   UpCharacterImage fooTextImage = new UpCharacterImage(5);
-	   content.add(new JLabel(new ImageIcon(fooTextImage.img)));
-	   
 	   UpBoardScan scan = new UpBoardScan();
-	   BufferedImage img = scan.getTile(3, 4);
-	   content.add(new JLabel(new ImageIcon(img)));
-	   f.pack();
-	   f.setVisible(true);
 	   
-	   boolean compareTiles = compareTiles(fooTextImage.img, img);
+	   UpCharacterImage numberTile = null;
+	   BufferedImage scanImg = null;
+	   boolean tilesMatch = false;
+	   for (int y = 0; y < 10; y++) {
+		   for (int x = 0; x < 10; x++) {
+			   if ((x == 11) && (y == 4)) {
+				   numberTile = new UpCharacterImage(4);
+				   scanImg = scan.getTile(x, y);
+				   tilesMatch = compareTiles(numberTile.img, scanImg, true);
+				   
+				   content.add(new JLabel(new ImageIcon(numberTile.img)));
+				   content.add(new JLabel(new ImageIcon(scanImg)));
+				   f.pack();
+				   f.setVisible(true);
+			   }
+			   for (int level = 1; level < 6; level++) {
+				   numberTile = new UpCharacterImage(level);
+				   scanImg = scan.getTile(x, y);
+				   tilesMatch = compareTiles(numberTile.img, scanImg, false);
+				   if (tilesMatch) {
+					   System.out.print(" " + numberTile.character);
+					   break;
+				   } 
+			   }
+			   if (!tilesMatch) {
+				   System.out.print(" 0");   
+			   }
+		   }
+		   System.out.println("");
+	   }
+	   
 	}
 }
