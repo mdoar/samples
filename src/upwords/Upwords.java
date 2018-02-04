@@ -30,7 +30,7 @@ public class Upwords {
 		float createdBlack = 0; 
 		float bothBlack = 0;
 		int COLOR_TOLERANCE = 6;
-		int BLACK_BREAKPOINT = 128;
+		int BLACK_BREAKPOINT = 100;
 		
 		for (int y = 0; y < 138; y++) {
 			for (int x = 0; x < 138; x++) {
@@ -60,7 +60,7 @@ public class Upwords {
 		if (logging) {
 			System.out.println("createdBlack =" + createdBlack + "    bothBlack = " + bothBlack);
 		}
-	    // If 90% of points were both black we have a match
+	    // If 80% of points were both black we have a match
 		if (bothBlack/createdBlack > .8) {
 			return(true);
 		}
@@ -85,10 +85,11 @@ public class Upwords {
 	   UpCharacterImage numberTile = null;
 	   BufferedImage scanImg = null;
 	   boolean tilesMatch = false;
+	   int[] levels = {1, 2, 3, 4, 5};
 	   for (int y = 0; y < 10; y++) {
 		   for (int x = 0; x < 10; x++) {
-			   if ((x == 11) && (y == 4)) {
-				   numberTile = new UpCharacterImage(4);
+			   if ((x == 19) && (y == 1)) {
+				   numberTile = new UpCharacterImage(2);
 				   scanImg = scan.getTile(x, y);
 				   tilesMatch = compareTiles(numberTile.img, scanImg, true);
 				   
@@ -97,7 +98,7 @@ public class Upwords {
 				   f.pack();
 				   f.setVisible(true);
 			   }
-			   for (int level = 1; level < 6; level++) {
+			   for (int level : levels) {
 				   numberTile = new UpCharacterImage(level);
 				   scanImg = scan.getTile(x, y);
 				   tilesMatch = compareTiles(numberTile.img, scanImg, false);
