@@ -92,15 +92,26 @@ public class Upwords {
 		   }
 	   });
 
+	   UpBoard board = new UpBoard();
 	   UpBoardScan scan = new UpBoardScan();
 	   
+	   /*
+	    *  Get the number titles
+	    */
 	   UpCharacterImage numberTile = null;
 	   BufferedImage scanImg = null;
 	   boolean tilesMatch = false;
 	   int[] levels = {1, 2, 3, 4, 5};
+	   
+	   /*
+	    * Make a pass through the board to identify stack levels for each space.
+	    */
 	   for (int y = 0; y < 10; y++) {
 		   for (int x = 0; x < 10; x++) {
-			   if ((x == 91) && (y == 6)) {
+			   /*
+			    * If x and y point to a real location then print some debugging and display the tiles
+			    */
+			   if ((x == 13) && (y == 6)) {
 				   numberTile = new UpCharacterImage(2);
 				   scanImg = scan.getTile(x, y);
 				   tilesMatch = compareTiles(numberTile.img, scanImg, true);
@@ -110,11 +121,16 @@ public class Upwords {
 				   f.pack();
 				   f.setVisible(true);
 			   }
+			   
+			   /*
+			    * Find the stack level of this space
+			    */
 			   for (int level : levels) {
 				   numberTile = new UpCharacterImage(level);
 				   scanImg = scan.getTile(x, y);
 				   tilesMatch = compareTiles(numberTile.img, scanImg, false);
 				   if (tilesMatch) {
+					   board.levels[x][y] = level;
 					   System.out.print(" " + numberTile.character);
 					   break;
 				   } 
@@ -125,6 +141,50 @@ public class Upwords {
 		   }
 		   System.out.println("");
 	   }
+	   
+	   /*
+	    * The second pass through the board identifies letters
+	    */
+	   String[] letters = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
+
+	   for (int y = 0; y < 10; y++) {
+		   for (int x = 0; x < 10; x++) {
+			   /*
+			    * If x and y point to a real location then print some debugging and display the tiles
+			    */
+			   if ((x == 13) && (y == 6)) {
+				   numberTile = new UpCharacterImage("A");
+				   scanImg = scan.getTile(x, y);
+				   tilesMatch = compareTiles(numberTile.img, scanImg, true);
+				   
+				   content.add(new JLabel(new ImageIcon(numberTile.img)));
+				   content.add(new JLabel(new ImageIcon(scanImg)));
+				   f.pack();
+				   f.setVisible(true);
+			   } 
+			   
+			   /*
+			    * Find the character of this space
+			    */
+			   for (String letter : letters) {
+				   numberTile = new UpCharacterImage(letter);
+				   scanImg = scan.getTile(x, y);
+				   tilesMatch = compareTiles(numberTile.img, scanImg, false);
+				   if (tilesMatch) {
+					   board.letters[x][y] = letter;
+					   System.out.print(" " + letter);
+					   break;
+				   } 
+			   }
+			   if (!tilesMatch) {
+				   board.letters[x][y] = ".";
+				   System.out.print(" .");   
+			   }
+		   }
+		   System.out.println("");
+	   }
+	   
+	   
 	   
 	}
 }

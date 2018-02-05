@@ -14,6 +14,7 @@ public class UpCharacterImage {
 
 	BufferedImage img;
 	String character;
+	int level;
 	int TILE_WIDTH = 138;
 	int TILE_HEIGHT = 138;
 	int STACK_HEIGHT=162;
