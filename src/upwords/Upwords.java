@@ -9,6 +9,10 @@ import javax.swing.*;
 public class Upwords {
 	
 	/*
+	 * Arbitrarily large number to represent grey saces
+	 */
+	static int GREY_SPACE = 12000;
+	/*
 	 * Determine if three integers are within limit of each other
 	 */
 	private static boolean numbersClose(int first, int second, int third, int limit) {
@@ -24,16 +28,85 @@ public class Upwords {
 		return(true);
 	}
 	
-	private static boolean compareTiles(BufferedImage created, BufferedImage sampled, boolean logging) {
+	/*
+	 * compareLetterTiles
+	 * 
+	 * Count up the number of black pixels in the sample tile and subtract the pixels that overlap with the created image. 
+	 * The lower the result the more the sample tile resembles the created tile.
+	 */
+	private static double compareLetterTiles(BufferedImage created, BufferedImage sampled, boolean logging) {
+		int cred, cgreen, cblue, sred, sgreen, sblue;
+		Color mycolor;
+		int blackCount = 0; 
+		int COLOR_TOLERANCE = 6;
+		int BLACK_BREAKPOINT = 100;
+		int X_UPPER_LEFT = 45;
+		int Y_UPPER_LEFT = 50;
+		int X_WIDTH = 50;
+		int Y_HEIGHT = 75;
+		double sampledBlack = 0;
+		double createdBlack = 0;
+		double bothBlack = 0;
+		
+		for (int y = Y_UPPER_LEFT; y < Y_UPPER_LEFT + Y_HEIGHT; y++) {
+			for (int x = X_UPPER_LEFT; x < X_UPPER_LEFT + X_WIDTH; x++) {
+				
+				mycolor = new Color(created.getRGB(x, y));
+				cred = mycolor.getRed();
+				cgreen = mycolor.getGreen();
+				cblue = mycolor.getBlue();
+				
+				mycolor = new Color(sampled.getRGB(x, y));
+				sred = mycolor.getRed();
+				sgreen = mycolor.getGreen();
+				sblue = mycolor.getBlue();
+
+				boolean createdIsBlack = numbersClose(cred, cgreen, cblue, COLOR_TOLERANCE) && (cred < BLACK_BREAKPOINT);
+				boolean sampledIsBlack = numbersClose(sred, sgreen, sblue, COLOR_TOLERANCE) && (sred < BLACK_BREAKPOINT);
+				// Treat red like it's black.
+				if ((sgreen < sred*.7) && (sblue < sred*.7)) {
+					sampledIsBlack = true;
+				}
+				
+				if (createdIsBlack && sampledIsBlack) {
+					created.setRGB(x, y, 0xffffffff);
+					bothBlack += 1;
+				} else 
+				if (createdIsBlack) {
+					createdBlack += 1;
+					blackCount++;
+				} else
+				if (sampledIsBlack) {
+					sampledBlack += 1;
+					blackCount++;
+				}
+			}
+		}
+		if (logging) {
+			System.out.println("blackCount =" + blackCount);
+		}
+		
+		
+		//System.out.println("blackCount =" + blackCount);
+		
+		/*
+		 * If 
+		 */
+		if (bothBlack == 0.0) {
+			return(GREY_SPACE);
+		}
+
+		return(bothBlack/blackCount);
+	}
+
+	
+	private static boolean compareTiles(BufferedImage created, BufferedImage sampled, double threshold, boolean logging) {
 		int cred, cgreen, cblue, sred, sgreen, sblue;
 		Color mycolor;
 		float createdBlack = 0; 
 		float bothBlack = 0;
 		int COLOR_TOLERANCE = 6;
 		int BLACK_BREAKPOINT = 100;
-		int RED_REDLIMIT = 100;
-		int RED_GREENLIMIT = 70;
-		int RED_BLUELIMIT = 70;
 		
 		for (int y = 0; y < 138; y++) {
 			for (int x = 0; x < 138; x++) {
@@ -72,8 +145,9 @@ public class Upwords {
 		if (logging) {
 			System.out.println("createdBlack =" + createdBlack + "    bothBlack = " + bothBlack);
 		}
-	    // If 80% of points were both black we have a match
-		if (bothBlack/createdBlack > .8) {
+
+		//System.out.println(bothBlack/createdBlack + "%");
+		if (bothBlack/createdBlack > threshold) {
 			return(true);
 		}
 		return(false);
@@ -111,10 +185,10 @@ public class Upwords {
 			   /*
 			    * If x and y point to a real location then print some debugging and display the tiles
 			    */
-			   if ((x == 13) && (y == 6)) {
-				   numberTile = new UpCharacterImage(2);
+			   if ((x == 25) && (y == 0)) {
+				   numberTile = new UpCharacterImage(1);
 				   scanImg = scan.getTile(x, y);
-				   tilesMatch = compareTiles(numberTile.img, scanImg, true);
+				   tilesMatch = compareTiles(numberTile.img, scanImg, .8, true);
 				   
 				   content.add(new JLabel(new ImageIcon(numberTile.img)));
 				   content.add(new JLabel(new ImageIcon(scanImg)));
@@ -128,7 +202,7 @@ public class Upwords {
 			   for (int level : levels) {
 				   numberTile = new UpCharacterImage(level);
 				   scanImg = scan.getTile(x, y);
-				   tilesMatch = compareTiles(numberTile.img, scanImg, false);
+				   tilesMatch = compareTiles(numberTile.img, scanImg, .8, false);
 				   if (tilesMatch) {
 					   board.levels[x][y] = level;
 					   System.out.print(" " + numberTile.character);
@@ -145,6 +219,8 @@ public class Upwords {
 	   /*
 	    * The second pass through the board identifies letters
 	    */
+	   double letterScore=0;
+	   UpCharacterImage letterTile = null;
 	   String[] letters = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
 
 	   for (int y = 0; y < 10; y++) {
@@ -152,12 +228,12 @@ public class Upwords {
 			   /*
 			    * If x and y point to a real location then print some debugging and display the tiles
 			    */
-			   if ((x == 13) && (y == 6)) {
-				   numberTile = new UpCharacterImage("A");
+			   if ((x == 24) && (y == 0)) {
+				   letterTile = new UpCharacterImage("B");
 				   scanImg = scan.getTile(x, y);
-				   tilesMatch = compareTiles(numberTile.img, scanImg, true);
-				   
-				   content.add(new JLabel(new ImageIcon(numberTile.img)));
+				   letterScore = compareLetterTiles(letterTile.img, scanImg, true);
+				   System.out.println("letterscore = " + letterScore);
+				   content.add(new JLabel(new ImageIcon(letterTile.img)));
 				   content.add(new JLabel(new ImageIcon(scanImg)));
 				   f.pack();
 				   f.setVisible(true);
@@ -166,20 +242,19 @@ public class Upwords {
 			   /*
 			    * Find the character of this space
 			    */
+			   double lowestScore = GREY_SPACE;
+			   String probableLetter = ".";
 			   for (String letter : letters) {
 				   numberTile = new UpCharacterImage(letter);
 				   scanImg = scan.getTile(x, y);
-				   tilesMatch = compareTiles(numberTile.img, scanImg, false);
-				   if (tilesMatch) {
-					   board.letters[x][y] = letter;
-					   System.out.print(" " + letter);
-					   break;
-				   } 
+				   letterScore = compareLetterTiles(numberTile.img, scanImg, false);
+				   if (letterScore < lowestScore) {
+					   lowestScore = letterScore;
+					   probableLetter = letter;
+				   }
 			   }
-			   if (!tilesMatch) {
-				   board.letters[x][y] = ".";
-				   System.out.print(" .");   
-			   }
+			   board.letters[x][y] = probableLetter;
+			   System.out.print(" " + probableLetter);
 		   }
 		   System.out.println("");
 	   }

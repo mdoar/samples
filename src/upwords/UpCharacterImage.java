@@ -67,13 +67,13 @@ public class UpCharacterImage {
 	 * Create the single character for the tile.
 	 */
     public UpCharacterImage(String text) {
- 		Font font = new Font("Helvetica Neue", Font.BOLD, 72);
+ 		Font font = new Font("Helvetica Neue", Font.BOLD, 75);
  		
  		/* 
- 		 * (50,90) is the upper left corner of the letter.
+ 		 * (xoffset, yoffset) the upper left corner of the letter.
  		 */
- 		int xoffset = 50;
- 		int yoffset = 90;
+ 		int xoffset = 42;
+ 		int yoffset = 122;
     		makeImage(text, font, xoffset, yoffset);
     }
 
