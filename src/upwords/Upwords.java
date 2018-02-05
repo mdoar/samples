@@ -31,6 +31,9 @@ public class Upwords {
 		float bothBlack = 0;
 		int COLOR_TOLERANCE = 6;
 		int BLACK_BREAKPOINT = 100;
+		int RED_REDLIMIT = 100;
+		int RED_GREENLIMIT = 70;
+		int RED_BLUELIMIT = 70;
 		
 		for (int y = 0; y < 138; y++) {
 			for (int x = 0; x < 138; x++) {
@@ -50,9 +53,18 @@ public class Upwords {
 					sred = mycolor.getRed();
 					sgreen = mycolor.getGreen();
 					sblue = mycolor.getBlue();
+					if (logging) {
+						String text = String.format("%d,%d  %d %d %d", x,y, sred, sgreen, sblue);
+						System.out.println(text);
+					}
 					
+					// Count the instances where both images' pixels are black.
 					if (numbersClose(sred, sgreen, sblue, COLOR_TOLERANCE) && (sred < BLACK_BREAKPOINT)) {
 						bothBlack += 1;
+					}
+					// Treat red like it's black.
+					if ((sgreen < sred*.7) && (sblue < sred*.7)) {
+						bothBlack +=1;
 					}
 				}
 			}
@@ -88,7 +100,7 @@ public class Upwords {
 	   int[] levels = {1, 2, 3, 4, 5};
 	   for (int y = 0; y < 10; y++) {
 		   for (int x = 0; x < 10; x++) {
-			   if ((x == 19) && (y == 1)) {
+			   if ((x == 91) && (y == 6)) {
 				   numberTile = new UpCharacterImage(2);
 				   scanImg = scan.getTile(x, y);
 				   tilesMatch = compareTiles(numberTile.img, scanImg, true);

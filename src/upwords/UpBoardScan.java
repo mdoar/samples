@@ -24,7 +24,7 @@ public class UpBoardScan {
 
 	public UpBoardScan() {
 		try {
-			img = ImageIO.read(new File("data/boards/IMG_0132.jpg"));
+			img = ImageIO.read(new File("data/boards/IMG_0124.jpg"));
 
 		} catch (IOException e) {
 			System.out.println("Failed to read image");
