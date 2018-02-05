@@ -88,13 +88,6 @@ public class Upwords {
 		
 		
 		//System.out.println("blackCount =" + blackCount);
-		
-		/*
-		 * If 
-		 */
-		if (bothBlack == 0.0) {
-			return(GREY_SPACE);
-		}
 
 		return(bothBlack/blackCount);
 	}
@@ -228,8 +221,8 @@ public class Upwords {
 			   /*
 			    * If x and y point to a real location then print some debugging and display the tiles
 			    */
-			   if ((x == 24) && (y == 0)) {
-				   letterTile = new UpCharacterImage("B");
+			   if ((x == 0) && (y == 0)) {
+				   letterTile = new UpCharacterImage("A");
 				   scanImg = scan.getTile(x, y);
 				   letterScore = compareLetterTiles(letterTile.img, scanImg, true);
 				   System.out.println("letterscore = " + letterScore);
@@ -242,14 +235,14 @@ public class Upwords {
 			   /*
 			    * Find the character of this space
 			    */
-			   double lowestScore = GREY_SPACE;
+			   double highestScore = 0.0;
 			   String probableLetter = ".";
 			   for (String letter : letters) {
 				   numberTile = new UpCharacterImage(letter);
 				   scanImg = scan.getTile(x, y);
 				   letterScore = compareLetterTiles(numberTile.img, scanImg, false);
-				   if (letterScore < lowestScore) {
-					   lowestScore = letterScore;
+				   if (letterScore > highestScore) {
+					   highestScore = letterScore;
 					   probableLetter = letter;
 				   }
 			   }

@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
+
+
 public class UpCharacterImage {
 
 	BufferedImage img;
@@ -18,6 +20,7 @@ public class UpCharacterImage {
 	int TILE_WIDTH = 138;
 	int TILE_HEIGHT = 138;
 	int STACK_HEIGHT=162;
+	
 	
 	/*
 	 * Build a standard 138x138 title with a letter or number in it.  This will be matched to the tile in the 
@@ -42,6 +45,11 @@ public class UpCharacterImage {
      g2d.setColor(Color.WHITE);
      g2d.fillRect(0, 0, TILE_WIDTH, STACK_HEIGHT);
      g2d.setColor(Color.BLACK);
+     
+     FontMetrics fm = g2d.getFontMetrics();
+     xoffset = (TILE_WIDTH - fm.stringWidth(text)) / 2;
+     //yoffset = ((TILE_HEIGHT - fm.getHeight()) / 2) + fm.getAscent();
+
      g2d.drawString(text, xoffset, yoffset);
 
      g2d.dispose();
