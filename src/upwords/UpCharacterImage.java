@@ -47,8 +47,9 @@ public class UpCharacterImage {
      g2d.setColor(Color.BLACK);
      
      FontMetrics fm = g2d.getFontMetrics();
-     xoffset = (TILE_WIDTH - fm.stringWidth(text)) / 2;
-     //yoffset = ((TILE_HEIGHT - fm.getHeight()) / 2) + fm.getAscent();
+     if (xoffset == -1) {
+    	 	xoffset = (TILE_WIDTH - fm.stringWidth(text)) / 2;
+     }
 
      g2d.drawString(text, xoffset, yoffset);
 
@@ -74,15 +75,15 @@ public class UpCharacterImage {
 	/*
 	 * Create the single character for the tile.
 	 */
-    public UpCharacterImage(String text) {
+    public UpCharacterImage(String text, int level) {
  		Font font = new Font("Helvetica Neue", Font.BOLD, 75);
  		
  		/* 
  		 * (xoffset, yoffset) the upper left corner of the letter.
  		 */
  		int xoffset = 42;
- 		int yoffset = 122;
-    		makeImage(text, font, xoffset, yoffset);
+ 		int[] yoffsets = {0, 122, 114, 106, 98, 90};
+    		makeImage(text, font, -1, yoffsets[level]);
     }
 
 }

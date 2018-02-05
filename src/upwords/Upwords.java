@@ -178,7 +178,7 @@ public class Upwords {
 			   /*
 			    * If x and y point to a real location then print some debugging and display the tiles
 			    */
-			   if ((x == 25) && (y == 0)) {
+			   if ((x == 2) && (y == 0)) {
 				   numberTile = new UpCharacterImage(1);
 				   scanImg = scan.getTile(x, y);
 				   tilesMatch = compareTiles(numberTile.img, scanImg, .8, true);
@@ -221,8 +221,8 @@ public class Upwords {
 			   /*
 			    * If x and y point to a real location then print some debugging and display the tiles
 			    */
-			   if ((x == 0) && (y == 0)) {
-				   letterTile = new UpCharacterImage("A");
+			   if ((x == 20) && (y == 0)) {
+				   letterTile = new UpCharacterImage("A", board.levels[x][y]);
 				   scanImg = scan.getTile(x, y);
 				   letterScore = compareLetterTiles(letterTile.img, scanImg, true);
 				   System.out.println("letterscore = " + letterScore);
@@ -238,7 +238,7 @@ public class Upwords {
 			   double highestScore = 0.0;
 			   String probableLetter = ".";
 			   for (String letter : letters) {
-				   numberTile = new UpCharacterImage(letter);
+				   numberTile = new UpCharacterImage(letter, board.levels[x][y]);
 				   scanImg = scan.getTile(x, y);
 				   letterScore = compareLetterTiles(numberTile.img, scanImg, false);
 				   if (letterScore > highestScore) {
