@@ -11,7 +11,7 @@ public class Upwords {
 	/*
 	 * Arbitrarily large number to represent grey saces
 	 */
-	static int GREY_SPACE = 12000;
+	static int GREY_TILE = 12000;
 	/*
 	 * Determine if three integers are within limit of each other
 	 */
@@ -41,11 +41,10 @@ public class Upwords {
 		int COLOR_TOLERANCE = 6;
 		int BLACK_BREAKPOINT = 100;
 		int X_UPPER_LEFT = 45;
-		int Y_UPPER_LEFT = 50;
+		int Y_UPPER_LEFT = 20;
 		int X_WIDTH = 50;
-		int Y_HEIGHT = 75;
-		double sampledBlack = 0;
-		double createdBlack = 0;
+		int Y_HEIGHT = 100;
+		double xorBlack = 0;
 		double bothBlack = 0;
 		
 		for (int y = Y_UPPER_LEFT; y < Y_UPPER_LEFT + Y_HEIGHT; y++) {
@@ -71,14 +70,9 @@ public class Upwords {
 				if (createdIsBlack && sampledIsBlack) {
 					created.setRGB(x, y, 0xffffffff);
 					bothBlack += 1;
-				} else 
-				if (createdIsBlack) {
-					createdBlack += 1;
-					blackCount++;
-				} else
-				if (sampledIsBlack) {
-					sampledBlack += 1;
-					blackCount++;
+				} else		
+				if ((sampledIsBlack) || createdIsBlack) {
+					xorBlack++;
 				}
 			}
 		}
@@ -88,8 +82,7 @@ public class Upwords {
 		
 		
 		//System.out.println("blackCount =" + blackCount);
-
-		return(bothBlack/blackCount);
+		return(xorBlack/bothBlack);
 	}
 
 	
@@ -146,8 +139,7 @@ public class Upwords {
 		return(false);
 	}
 	
-   public static void main(String[] args) {
-	 
+   private static void loadBoardFromImage() {
 	   JFrame f = new JFrame("Load Image Sample");
 	   Container content = f.getContentPane();
 	   content.setLayout(new FlowLayout());
@@ -178,7 +170,7 @@ public class Upwords {
 			   /*
 			    * If x and y point to a real location then print some debugging and display the tiles
 			    */
-			   if ((x == 2) && (y == 0)) {
+			   if ((x == 22) && (y == 0)) {
 				   numberTile = new UpCharacterImage(1);
 				   scanImg = scan.getTile(x, y);
 				   tilesMatch = compareTiles(numberTile.img, scanImg, .8, true);
@@ -221,8 +213,8 @@ public class Upwords {
 			   /*
 			    * If x and y point to a real location then print some debugging and display the tiles
 			    */
-			   if ((x == 20) && (y == 0)) {
-				   letterTile = new UpCharacterImage("A", board.levels[x][y]);
+			   if ((x == 7) && (y == 7)) {
+				   letterTile = new UpCharacterImage("S", board.levels[x][y]);
 				   scanImg = scan.getTile(x, y);
 				   letterScore = compareLetterTiles(letterTile.img, scanImg, true);
 				   System.out.println("letterscore = " + letterScore);
@@ -235,14 +227,14 @@ public class Upwords {
 			   /*
 			    * Find the character of this space
 			    */
-			   double highestScore = 0.0;
+			   double lowestScore = GREY_TILE;
 			   String probableLetter = ".";
 			   for (String letter : letters) {
 				   numberTile = new UpCharacterImage(letter, board.levels[x][y]);
 				   scanImg = scan.getTile(x, y);
 				   letterScore = compareLetterTiles(numberTile.img, scanImg, false);
-				   if (letterScore > highestScore) {
-					   highestScore = letterScore;
+				   if (letterScore < lowestScore) {
+					   lowestScore = letterScore;
 					   probableLetter = letter;
 				   }
 			   }
@@ -255,4 +247,15 @@ public class Upwords {
 	   
 	   
 	}
+   
+   private static void findWords(UpBoard board) {
+	   
+   }
+   
+   public static void main(String[] args) {
+	   UpBoard board = new UpBoard();
+	   board.useSampleData(1);
+	   board.dump();
+	   findWords(board);
+   }
 }
