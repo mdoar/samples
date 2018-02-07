@@ -3,10 +3,16 @@ package upwords;
 public class UpBoard {
 	int[][] levels;
 	String[][] letters;
+	char[] rack;
+	
+	int PASS_INVALID = 0;
+	int PASS_HORIZONTAL = 1;
+	int PASS_VERTICAL = 2;
 	
 	public UpBoard() {
 		levels = new int[10][10];
 		letters = new String[10][10];
+		rack = new char[7];
 	}
 	
 	public void dump() {
@@ -29,10 +35,38 @@ public class UpBoard {
 		}
 	}
 	
+	/*
+	 * Okay, let's do it.  The order of events is this:
+	 * 
+	 * 1) Remove all dictionary words that don't include at least one rack letter
+	 * 1) Remove all dictionary words that aren't entirely made of letters in the rack or on the board
+	 * 2) Sort words into buckets by length
+	 * 3) Loop through entire board
+	 * 3.1) Do horizontal and vertical checks on each space.  The only difference
+	 * 		is that horizontal looks to the right and vertical looks down
+	 * 3.2) Make a list of spaces worth checking.  Specifically list the line
+	 * 		and the two adjacent lines tiles starting with the current space.  
+	 * 		If there are no tiles in that list then move on to next line.
+	 * 3.3) Make a length list for each worthy space.  Skip any impossible lengths
+	 * 		(like 7 when we're 6 tiles from the end)
+	 * 3.4) Walk through the dictionary buckets that match the valid lengths
+	 */
+	public void processBoard() {
+		UpDict dict = new UpDict(this);
+	}
+	
 	public void useSampleData(int sampleNumber)
 	{
 		if (sampleNumber == 1) {
 			// This sample corresponds to IMG_0124.jpg
+			rack[0] = 'A';
+			rack[1] = 'B';
+			rack[2] = 'C';
+			rack[3] = 'D';
+			rack[4] = 'E';
+			rack[5] = 'F';
+			rack[6] = 'G';
+			
 			// row 0
 			levels[0][2] = 1;
 			letters[0][2] = "J";

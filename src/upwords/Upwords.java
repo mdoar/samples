@@ -248,14 +248,10 @@ public class Upwords {
 	   
 	}
    
-   private static void findWords(UpBoard board) {
-	   
-   }
-   
    public static void main(String[] args) {
 	   UpBoard board = new UpBoard();
 	   board.useSampleData(1);
 	   board.dump();
-	   findWords(board);
+	   board.processBoard();
    }
 }
