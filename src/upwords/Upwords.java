@@ -228,14 +228,14 @@ public class Upwords {
 			    * Find the character of this space
 			    */
 			   double lowestScore = GREY_TILE;
-			   String probableLetter = ".";
+			   char probableLetter = '.';
 			   for (String letter : letters) {
 				   numberTile = new UpCharacterImage(letter, board.levels[x][y]);
 				   scanImg = scan.getTile(x, y);
 				   letterScore = compareLetterTiles(numberTile.img, scanImg, false);
 				   if (letterScore < lowestScore) {
 					   lowestScore = letterScore;
-					   probableLetter = letter;
+					   probableLetter = letter.charAt(0);
 				   }
 			   }
 			   board.letters[x][y] = probableLetter;
@@ -250,7 +250,7 @@ public class Upwords {
    
    public static void main(String[] args) {
 	   UpBoard board = new UpBoard();
-	   board.useSampleData(1);
+	   board.useSampleData(0);
 	   board.dump();
 	   board.processBoard();
    }

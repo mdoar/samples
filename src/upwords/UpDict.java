@@ -25,29 +25,16 @@ public class UpDict {
 		 * on the board or in the rack.
 		 */
 		
-		// Let's start with the set of letters on the board.  We're going to expand set later so leave some room.
-		Set<String> boardTileSet = new HashSet<String>();
+		// There are one hundred spaces on the board and we add in another 26*2 for good measure
+		char[] onBoardTiles = new char[152];
+		int onBoardTilesIndex = 0;
 		for (int x = 0; x < 10; x++) {
 			for (int y =  0; y < 10; y++) {
-				if (board.letters[x][y] == null) {
+				if (board.letters[x][y] == 0) {
 					continue;
 				}
-				boardTileSet.add(board.letters[x][y]);
+				onBoardTiles[onBoardTilesIndex++] = board.letters[x][y];
 			}
-		}
-		/*
-		 * Convert the set to an array of Strings.
-		 */
-		String[] tileLetters = boardTileSet.toArray(new String[boardTileSet.size()]);
-
-		/*
-		 * Create the onBoardTiles array and start moving things into it.  Obviously there can only be twenty six
-		 * unique members, but we're probably going to add duplicates fromt the rack so leave plenty of room.
-		 */
-		char[] onBoardTiles = new char[52];
-		int onBoardTilesIndex = 0;
-		for (onBoardTilesIndex = 0; onBoardTilesIndex < tileLetters.length; onBoardTilesIndex++) {
-			onBoardTiles[onBoardTilesIndex] = tileLetters[onBoardTilesIndex].charAt(0);
 		}
 		
 		/*
