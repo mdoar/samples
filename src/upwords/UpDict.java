@@ -11,8 +11,8 @@ import java.io.FileNotFoundException;
 
 public class UpDict {
 	String dictionaryFilename = "data/dictionary.txt";
-	boolean valid = true;
-	ArrayList<ArrayList> baseDict;   // 10 bins of words, one for each length
+	boolean valid = true; 
+	ArrayList<String>[] baseDict;
 	
 	
 	private static String makeRawBoardAndRackPattern(UpBoard board) {
@@ -79,9 +79,8 @@ public class UpDict {
 	
 	    // This will reference one line at a time
 	    String line;
-	    baseDict = new ArrayList<ArrayList>();
-	    for (int i = 0; i <= 0; i++) {
-	    		baseDict.add(i, new ArrayList<String>());
+	    for (int i = 0; i <= 10; i++) {
+	    		baseDict[i] = new ArrayList<String>();
 	    }
 	
 	    try {
@@ -129,7 +128,7 @@ public class UpDict {
 	        			continue;
 	        		}
 
-	        		ArrayList dictForSize = baseDict.get(len);
+	        		ArrayList<String> dictForSize = baseDict[len];
 	        		dictForSize.add(line);
 	        }   
 	

@@ -81,7 +81,7 @@ public class UpBoard {
 		 * Now check to see if we have a valid word
 		 */
 		String newWord = new String(wordBytes, 0, wordLength);
-		ArrayList<String> specificDict = dict.baseDict.get(newWord.length());
+		ArrayList<String> specificDict = dict.baseDict[newWord.length()];
 		boolean validWord = specificDict.contains(newWord);
 		//System.out.println(wordLength + "     " + newWord);
 		if (!validWord) {
@@ -194,7 +194,7 @@ public class UpBoard {
 				String winningWord = "";
 				int winningOrientation = PASS_INVALID;
 				for (int wordLength = 0; wordLength < BOARD_SIZE - x; wordLength++) {
-					ArrayList<String> words = dict.baseDict.get(wordLength);
+					ArrayList<String> words = dict.baseDict[wordLength];
 
 					for (String word : words) {
 						int score;
@@ -212,6 +212,8 @@ public class UpBoard {
 						}
 					}
 				}
+				System.out.println("Word: " + winningWord + "   Orientation: " + winningOrientation +
+								   "    Score: " + highScore);
 			}
 		}
 	}
