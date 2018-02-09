@@ -7,28 +7,32 @@ public class UpBoard {
 	char[][] letters;
 	char[] rack;
 	
+	UpDict dict;
+	
 	int BOARD_SIZE = 10;
+	int RACK_SIZE = 7;
+	int MAX_WORD_LENGTH = 10;
 	
 	int PASS_INVALID = 0;
 	int PASS_HORIZONTAL = 1;
 	int PASS_VERTICAL = 2;
 	
 	public UpBoard() {
-		levels = new int[10][10];
-		letters = new char[10][10];
-		rack = new char[7];
+		levels = new int[BOARD_SIZE][BOARD_SIZE];
+		letters = new char[BOARD_SIZE][BOARD_SIZE];
+		rack = new char[RACK_SIZE];
 	}
 	
 	public void dump() {
-		for (int i = 0; i < 10; i++) {
-			for (int j = 0; j < 10; j++) {
+		for (int i = 0; i < BOARD_SIZE; i++) {
+			for (int j = 0; j < BOARD_SIZE; j++) {
 				System.out.print(" " + levels[i][j]);
 			}
 			System.out.println("");
 		}
 		
-		for (int i = 0; i < 10; i++) {
-			for (int j = 0; j < 10; j++) {
+		for (int i = 0; i < BOARD_SIZE; i++) {
+			for (int j = 0; j < BOARD_SIZE; j++) {
 				if (levels[i][j] != 0) {
 					System.out.print(" " + letters[i][j]);
 				} else {
@@ -46,8 +50,8 @@ public class UpBoard {
 	private int getVerticalWordScore(int x, int y, char letter) {
 		//  First, find the top and bottom of the word.  The search loops overshoot by one, so roll them back.
 		int top, bottom;
-		for (top = y; (top >= 0) && (letters[top][x] != 0); top--);   // loop is just setting top
-		for (bottom = y; (bottom <= 9) && (letters[bottom][x] != 0); bottom++);   // loop is just setting bottom
+		for (top = y; (top >= 0) && (letters[top][x] != 0); top--) {};   // loop is just setting top
+		for (bottom = y; (bottom < BOARD_SIZE) && (letters[bottom][x] != 0); bottom++) {};   // loop is just setting bottom
 		top++;
 		bottom--;
 		
@@ -56,26 +60,112 @@ public class UpBoard {
 			return(0);
 		}
 		
-		int score;
-		int index = 0;
-		char[] wordBytes = new char[10];
+		/*
+		 * Build up the word into wordBytes
+		 */
+		int score = 0;
+		int wordLength = 0;
+		char[] wordBytes = new char[MAX_WORD_LENGTH];
 		for (int i = top; i <= bottom; i++) {
-			wordBytes[index++] = letters[i][x];
+			if (i == y) {
+				//  This is the new tile.  Add 1 to the score as this is a new level
+				wordBytes[wordLength++] = letter;
+				score += (levels[i][x] + 1);
+			} else {
+				wordBytes[wordLength++] = letters[i][x];
+				score += levels[i][x];
+			}
 		}
 		
-		System.out.println(y + ", " + x + "    Top =" + top + "   Bottom =" + bottom);
+		/*
+		 * Now check to see if we have a valid word
+		 */
+		String newWord = new String(wordBytes, 0, wordLength);
+		ArrayList<String> specificDict = dict.baseDict.get(newWord.length());
+		boolean validWord = specificDict.contains(newWord);
+		//System.out.println(wordLength + "     " + newWord);
+		if (!validWord) {
+			return(0);
+		}
+
+		System.out.println(newWord + "     " + y + ", " + x + "    Top =" + top + "   Bottom =" + bottom + "    Score =" + score);
 		
-		return(0);
+		return(score);
 	}
 
 	private int getTotalWordScore(int passtype, int x, int y, String word) {
 		//System.out.println(word);	
-		for (int i = 0; i < word.length(); i++) {
-			int score = getVerticalWordScore(x+i, y, word.charAt(i));
-			if ((y==1) && (i == 3)) System.exit(0);
+		int total = 0;
+		if (passtype == PASS_HORIZONTAL) {
+			// Horizontal word
+			// Walk through the new word adding up all the Vertical words that were changed
+			for (int i = 0; i < word.length(); i++) {
+				total += getVerticalWordScore(x+i, y, word.charAt(i));
+			}
+			
+			/*
+			 * We'll need either a vertical word or an overlap with an existing horizontal word
+			 * in order to score.
+			 */
+			boolean adjacentWords=true;
+			if (total == 0) {
+				adjacentWords = false;
+			}
+				
+			//  Add up the word itself
+			for (int i = 0; i < word.length(); i++) {
+				if (levels[y][x+i] != 0) {
+					// We're overlapping with an existing tile
+					adjacentWords = true;
+				}
+				total += levels[y][x+i];    // add the current level of the tile we're overwriting
+				total += 1;  // add one for the new tile
+			}
+			
+			if (!adjacentWords) {
+				total = 0;
+			} else {
+				System.out.println("(" + y + ", " + x + ")   " + word + "    " + total);
+			}
+			
+		} else {
+			// Vertical word
+			// Walk through the new word adding up all the Horizontal words that were changed
+			// Horizontal word
+			// Walk through the new word adding up all the Horizontal words that were changed
+			for (int i = 0; i < word.length(); i++) {
+				total += getHorizontalWordScore(x, y+i, word.charAt(i));
+			}
+
+			/*
+			 * We'll need either a horizontal word or an overlap with an existing vertical word
+			 * in order to score.
+			 */
+			boolean adjacentWords=true;
+			if (total == 0) {
+				adjacentWords = false;
+			}
+
+			//  Add up the word itself
+			for (int i = 0; i < word.length(); i++) {
+				if (levels[y+i][x] != 0) {
+					// We're overlapping with an existing tile
+					adjacentWords = true;
+				}
+				total += levels[y+i][x];    // add the current level of the tile we're overwriting
+				total += 1;  // add one for the new tile
+			}
+
+			if (!adjacentWords) {
+				total = 0;
+			} else {
+				System.out.println("(" + y + ", " + x + ")   " + word + "    " + total);
+			}
+
 		}
 		
-		return(0);
+		
+		return(total);
 	}
 	
 	/*
@@ -85,7 +175,7 @@ public class UpBoard {
 	 * 1) Remove all dictionary words that aren't entirely made of letters in the rack or on the board
 	 * 2) Sort words into buckets by length
 	 * 3) Loop through entire board
-	 * 3.1) Do horizontal and vertical checks on each space.  The only difference
+	 * 3.1) Do horizontal and vertical words checks on each space.  The only difference
 	 * 		is that horizontal looks to the right and vertical looks down
 	 * 3.4) Walk through the dictionary buckets that match the valid lengths
 	 */
@@ -93,19 +183,33 @@ public class UpBoard {
 		/*
 		 * The dictionary will arrive with only words that are possible.
 		 */
-		UpDict dict = new UpDict(this);
+		dict = new UpDict(this);
 		for (int y = 0; y < BOARD_SIZE; y++) {
 			for (int x = 0; x < BOARD_SIZE; x++) {
 				/*
 				 * let's start with a very simplistic algorithm.  Try every word in each space,
 				 * with the exception that we'll only try word lengths that can fit on the rest of the line.
 				 */
+				int highScore = 0;
+				String winningWord = "";
+				int winningOrientation = PASS_INVALID;
 				for (int wordLength = 0; wordLength < BOARD_SIZE - x; wordLength++) {
 					ArrayList<String> words = dict.baseDict.get(wordLength);
+
 					for (String word : words) {
 						int score;
 						score = getTotalWordScore(PASS_HORIZONTAL, x, y, word);
+						if (score > highScore) {
+							highScore = score;
+							winningWord = word;
+							winningOrientation = PASS_HORIZONTAL;
+						}
 						score = getTotalWordScore(PASS_VERTICAL, x, y, word);
+						if (score > highScore) {
+							highScore = score;
+							winningWord = word;
+							winningOrientation = PASS_VERTICAL;
+						}
 					}
 				}
 			}
@@ -115,14 +219,14 @@ public class UpBoard {
 	public void useSampleData(int sampleNumber)
 	{
 		if (sampleNumber == 0) {
-			// This sample corresponds to IMG_0124.jpg
+			// This is a simple board for simple tests
 			rack[0] = 'A';
 			rack[1] = 'B';
 			rack[2] = 'C';
 			rack[3] = 'D';
 			rack[4] = 'E';
 			rack[5] = 'F';
-			rack[6] = 'G';
+			rack[6] = 'U';
 			
 			// Row 2 across "FOUL"
 			levels[2][2] = 1;

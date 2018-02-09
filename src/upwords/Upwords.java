@@ -1,10 +1,13 @@
 package upwords;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.*;
-import java.io.*;
-import javax.imageio.*;
-import javax.swing.*;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.FlowLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.ImageIcon;
 
 public class Upwords {
 	
@@ -35,17 +38,22 @@ public class Upwords {
 	 * The lower the result the more the sample tile resembles the created tile.
 	 */
 	private static double compareLetterTiles(BufferedImage created, BufferedImage sampled, boolean logging) {
-		int cred, cgreen, cblue, sred, sgreen, sblue;
-		Color mycolor;
-		int blackCount = 0; 
-		int COLOR_TOLERANCE = 6;
-		int BLACK_BREAKPOINT = 100;
-		int X_UPPER_LEFT = 45;
-		int Y_UPPER_LEFT = 20;
-		int X_WIDTH = 50;
-		int Y_HEIGHT = 100;
+		final int COLOR_TOLERANCE = 6;
+		final int BLACK_BREAKPOINT = 100;
+		final int X_UPPER_LEFT = 45;
+		final int Y_UPPER_LEFT = 20;
+		final int X_WIDTH = 50;
+		final int Y_HEIGHT = 100;
 		double xorBlack = 0;
 		double bothBlack = 0;
+		int cred;
+		int cgreen; 
+		int cblue;
+		int sred;
+		int sgreen; 
+		int sblue;
+		Color mycolor;
+		int blackCount = 0; 
 		
 		for (int y = Y_UPPER_LEFT; y < Y_UPPER_LEFT + Y_HEIGHT; y++) {
 			for (int x = X_UPPER_LEFT; x < X_UPPER_LEFT + X_WIDTH; x++) {
@@ -91,11 +99,12 @@ public class Upwords {
 		Color mycolor;
 		float createdBlack = 0; 
 		float bothBlack = 0;
-		int COLOR_TOLERANCE = 6;
-		int BLACK_BREAKPOINT = 100;
+		final int COLOR_TOLERANCE = 6;
+		final int BLACK_BREAKPOINT = 100;
+		final int BOARD_SQUARE_SIZE = 138;
 		
-		for (int y = 0; y < 138; y++) {
-			for (int x = 0; x < 138; x++) {
+		for (int y = 0; y < BOARD_SQUARE_SIZE; y++) {
+			for (int x = 0; x < BOARD_SQUARE_SIZE; x++) {
 
 				mycolor = new Color(created.getRGB(x, y));
 				cred = mycolor.getRed();
@@ -160,13 +169,14 @@ public class Upwords {
 	   UpCharacterImage numberTile = null;
 	   BufferedImage scanImg = null;
 	   boolean tilesMatch = false;
-	   int[] levels = {1, 2, 3, 4, 5};
+	   final int BOARD_SIZE = 10;
+
 	   
 	   /*
 	    * Make a pass through the board to identify stack levels for each space.
 	    */
-	   for (int y = 0; y < 10; y++) {
-		   for (int x = 0; x < 10; x++) {
+	   for (int y = 0; y < BOARD_SIZE; y++) {
+		   for (int x = 0; x < BOARD_SIZE; x++) {
 			   /*
 			    * If x and y point to a real location then print some debugging and display the tiles
 			    */
@@ -182,12 +192,14 @@ public class Upwords {
 			   }
 			   
 			   /*
-			    * Find the stack level of this space
+			    * Find the stack level of this space by generating a number image a 
 			    */
-			   for (int level : levels) {
+			   final double MIN_MATCH_RATIO = .8;
+			   final int[] LEVELS = {1, 2, 3, 4, 5};
+			   for (int level : LEVELS) {
 				   numberTile = new UpCharacterImage(level);
 				   scanImg = scan.getTile(x, y);
-				   tilesMatch = compareTiles(numberTile.img, scanImg, .8, false);
+				   tilesMatch = compareTiles(numberTile.img, scanImg, MIN_MATCH_RATIO, false);
 				   if (tilesMatch) {
 					   board.levels[x][y] = level;
 					   System.out.print(" " + numberTile.character);
@@ -206,14 +218,13 @@ public class Upwords {
 	    */
 	   double letterScore=0;
 	   UpCharacterImage letterTile = null;
-	   String[] letters = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
 
-	   for (int y = 0; y < 10; y++) {
-		   for (int x = 0; x < 10; x++) {
+	   for (int y = 0; y < BOARD_SIZE; y++) {
+		   for (int x = 0; x < BOARD_SIZE; x++) {
 			   /*
 			    * If x and y point to a real location then print some debugging and display the tiles
 			    */
-			   if ((x == 7) && (y == 7)) {
+			   if ((x == 17) && (y == 7)) {
 				   letterTile = new UpCharacterImage("S", board.levels[x][y]);
 				   scanImg = scan.getTile(x, y);
 				   letterScore = compareLetterTiles(letterTile.img, scanImg, true);
@@ -227,9 +238,11 @@ public class Upwords {
 			   /*
 			    * Find the character of this space
 			    */
+			   final String[] LETTERS = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
+	                     				 "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
 			   double lowestScore = GREY_TILE;
 			   char probableLetter = '.';
-			   for (String letter : letters) {
+			   for (String letter : LETTERS) {
 				   numberTile = new UpCharacterImage(letter, board.levels[x][y]);
 				   scanImg = scan.getTile(x, y);
 				   letterScore = compareLetterTiles(numberTile.img, scanImg, false);

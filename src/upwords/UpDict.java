@@ -3,11 +3,7 @@ package upwords;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.io.FileNotFoundException;
@@ -25,11 +21,12 @@ public class UpDict {
 		 * on the board or in the rack.
 		 */
 		
+	    final int BOARD_SIZE = 10;
 		// There are one hundred spaces on the board and we add in another 26*2 for good measure
 		char[] onBoardTiles = new char[152];
 		int onBoardTilesIndex = 0;
-		for (int x = 0; x < 10; x++) {
-			for (int y =  0; y < 10; y++) {
+		for (int x = 0; x < BOARD_SIZE; x++) {
+			for (int y =  0; y < BOARD_SIZE; y++) {
 				if (board.letters[x][y] == 0) {
 					continue;
 				}
@@ -49,7 +46,9 @@ public class UpDict {
 		 * remove these letters from a list of A-Z to get the inverse list.  Any word with letters
 		 * on the inverse list will be invalid because the letter isn't in play.
 		 */
-		char inverseList[] = new char[52];
+		//  There are 26 letters in the alphabet.  Well the standard English one anyway, but we're
+		//  not going there.
+		char inverseList[] = new char[26];
 		int findex = 0;
 		for (int i = 0; i < 26; i++) {
 			boolean found = false;
@@ -81,7 +80,7 @@ public class UpDict {
 	    // This will reference one line at a time
 	    String line;
 	    baseDict = new ArrayList<ArrayList>();
-	    for (int i = 0; i < 11; i++) {
+	    for (int i = 0; i <= 0; i++) {
 	    		baseDict.add(i, new ArrayList<String>());
 	    }
 	
