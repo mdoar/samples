@@ -8,19 +8,26 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.io.FileNotFoundException;
 
-
+/** Generate a dictionary of possible words for a board
+ * 
+ * @author tkolar
+ * 
+ * We start with a raw Scrabble dictionary and then remove words that are impossible due
+ * to not containing any letters from the rack or board.
+ *
+ */
 public class UpDict {
 	String dictionaryFilename = "data/dictionary.txt";
 	boolean valid = true; 
 	ArrayList<String>[] baseDict;
 	
-	
+
+	/*
+	 * Create a regex that will only find letters that don't yet exist
+	 * on the board or in the rack.
+	 */	
 	private static String makeRawBoardAndRackPattern(UpBoard board) {
-		/*
-		 * Create a regex that will only find letters that don't yet exist
-		 * on the board or in the rack.
-		 */
-		
+
 	    final int BOARD_SIZE = 10;
 		// There are one hundred spaces on the board and we add in another 26*2 for good measure
 		char[] onBoardTiles = new char[152];
@@ -46,6 +53,7 @@ public class UpDict {
 		 * remove these letters from a list of A-Z to get the inverse list.  Any word with letters
 		 * on the inverse list will be invalid because the letter isn't in play.
 		 */
+		
 		//  There are 26 letters in the alphabet.  Well the standard English one anyway, but we're
 		//  not going there.
 		char inverseList[] = new char[26];
@@ -77,7 +85,10 @@ public class UpDict {
 	
 	public UpDict(UpBoard board) {
 	
-	    // This will reference one line at a time
+	    /*
+	     * Our base dictionary is a normal array of ArrayLists of type string.  The normal
+	     * array contains ten ArrayLists that will contain words of length one, two, three, etc.
+	     */
 	    String line;
 	    for (int i = 0; i <= 10; i++) {
 	    		baseDict[i] = new ArrayList<String>();
@@ -85,21 +96,19 @@ public class UpDict {
 	
 	    try {
 	        // FileReader reads text files in the default encoding.
-	        FileReader fileReader = 
-	            new FileReader(dictionaryFilename);
+	        FileReader fileReader = new FileReader(dictionaryFilename);
 	
 	        // Always wrap FileReader in BufferedReader.
-	        BufferedReader bufferedReader = 
-	            new BufferedReader(fileReader);
+	        BufferedReader bufferedReader = new BufferedReader(fileReader);
 
 	        /*
-	         * Get the pattern that matches words that contain letters in the rack
+	         * Make a pattern that matches words that contain letters in the rack
 	         */
 			String rawRackPattern = makeRawRackPattern(board.rack);
 			Pattern rackPattern = Pattern.compile(rawRackPattern);
 			
 			/*
-			 * Get the pattern that matches words that contain letters that are not on the rack or the board.
+			 * Makes pattern that matches words that contain letters that are not on the rack or the board.
 			 */
 	        	String rawBoardAndRackPattern = makeRawBoardAndRackPattern(board) ;
 	        	Pattern boardAndRackPattern = Pattern.compile(rawBoardAndRackPattern);
@@ -132,7 +141,7 @@ public class UpDict {
 	        		dictForSize.add(line);
 	        }   
 	
-	        // Always close files.
+	        // Close her up.
 	        bufferedReader.close();         
 	    }
 	    catch(FileNotFoundException ex) {

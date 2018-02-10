@@ -7,6 +7,16 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
+/** Create a BufferedImage of a character.
+ * 
+ * @author tkolar
+ *
+ *  The images are specific to Upwords tiles.  Specifically numbers are
+ *  drawn to compare with the numbers on the existing tiles, which means
+ *  small and in the upper righthand corner.  Alphabetic characters are 
+ *  drawn large and in the center.
+ */
+
 public class UpCharacterImage {
 
 	BufferedImage img;
@@ -15,7 +25,6 @@ public class UpCharacterImage {
 	int TILE_WIDTH = 138;
 	int TILE_HEIGHT = 138;
 	int STACK_HEIGHT=162;
-	
 	
 	/*
 	 * Build a standard 138x138 title with a letter or number in it.  This will be matched to the tile in the 
@@ -43,6 +52,8 @@ public class UpCharacterImage {
      
      FontMetrics fm = g2d.getFontMetrics();
      if (xoffset == -1) {
+    	    // if no xoffset was passed, use the center of the tile minus half the text width.
+    	    // +2 moves it to match what is on the sampled tile.
     	 	xoffset = ((TILE_WIDTH - fm.stringWidth(text)) / 2) + 2;
      }
 
@@ -59,8 +70,10 @@ public class UpCharacterImage {
 		Font font = new Font("Apple Color Emoji", Font.PLAIN, 28);
 		String text = String.format("%d", number);
 		
-		// The stack height goes with the number, and the number is offset a bit for each level of stack.
-		// The image numbers are slightly offset to the left and right as well.
+		/*
+		 * The stack height goes with the number, and the number is offset a bit for each
+		 * level of stack. The image numbers are slightly offset to the left and right as well.
+		 */
 		int[] yoffsets = {0, 51, 43, 35, 27, 19};
 		int[] xoffsets = {0, 100, 99, 99, 98, 99};
 		

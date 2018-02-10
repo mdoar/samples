@@ -2,6 +2,11 @@ package upwords;
 
 import java.util.ArrayList;
 
+/** Owns all the board data and does the solving
+ * 
+ * @author tkolar
+ *
+ */
 public class UpBoard {
 	int[][] levels;
 	char[][] letters;
@@ -23,6 +28,9 @@ public class UpBoard {
 		rack = new char[RACK_SIZE];
 	}
 	
+	/*
+	 * Write out the board letters in a grid on the console
+	 */
 	public void dump() {
 		for (int i = 0; i < BOARD_SIZE; i++) {
 			for (int j = 0; j < BOARD_SIZE; j++) {
@@ -47,8 +55,14 @@ public class UpBoard {
 		return(0);
 	}
 	
+	/*
+	 * Given a space in a vertical word, locate its top and bottom and calculate its value
+	 */
 	private int getVerticalWordScore(int x, int y, char letter) {
-		//  First, find the top and bottom of the word.  The search loops overshoot by one, so roll them back.
+		/*
+		 * First, find the top and bottom of the word.  The search loops overshoot by one, 
+		 * so roll them back.
+		 */
 		int top, bottom;
 		for (top = y; (top >= 0) && (letters[top][x] != 0); top--) {};   // loop is just setting top
 		for (bottom = y; (bottom < BOARD_SIZE) && (letters[bottom][x] != 0); bottom++) {};   // loop is just setting bottom
@@ -88,31 +102,34 @@ public class UpBoard {
 			return(0);
 		}
 
-		System.out.println(newWord + "     " + y + ", " + x + "    Top =" + top + "   Bottom =" + bottom + "    Score =" + score);
+		//System.out.println(newWord + "     " + y + ", " + x + "    Top =" + top + "   Bottom =" + bottom + "    Score =" + score);
 		
 		return(score);
 	}
 
 	private int getTotalWordScore(int passtype, int x, int y, String word) {
-		//System.out.println(word);	
 		int total = 0;
 		if (passtype == PASS_HORIZONTAL) {
-			// Horizontal word
-			// Walk through the new word adding up all the Vertical words that were changed
+			/*
+			 * Horizontal word
+			 * Walk through the new word adding up all the Vertical words that were changed
+			 */
 			for (int i = 0; i < word.length(); i++) {
 				total += getVerticalWordScore(x+i, y, word.charAt(i));
 			}
 			
 			/*
-			 * We'll need either a vertical word or an overlap with an existing horizontal word
-			 * in order to score.
+			 * If there were no Horizontal words then we might not be a valid play
 			 */
 			boolean adjacentWords=true;
 			if (total == 0) {
 				adjacentWords = false;
 			}
 				
-			//  Add up the word itself
+			/*
+			 * Add up the word itself.  If there are no horizontal words and there is 
+			 * no overlap with a vertical one then this isn't a valid play.
+			 */
 			for (int i = 0; i < word.length(); i++) {
 				if (levels[y][x+i] != 0) {
 					// We're overlapping with an existing tile
@@ -122,31 +139,36 @@ public class UpBoard {
 				total += 1;  // add one for the new tile
 			}
 			
+			/*
+			 * If adjacentWords is still false then we don't have a valid word.
+			 */
 			if (!adjacentWords) {
 				total = 0;
 			} else {
-				System.out.println("(" + y + ", " + x + ")   " + word + "    " + total);
+				//System.out.println("(" + y + ", " + x + ")   " + word + "    " + total);
 			}
 			
 		} else {
-			// Vertical word
-			// Walk through the new word adding up all the Horizontal words that were changed
-			// Horizontal word
-			// Walk through the new word adding up all the Horizontal words that were changed
+			/* Vertical word
+			 * Walk through the new word adding up all the Horizontal words that were changed
+			 * by the new word and adding up all the Horizontal words that were changed
+			 */
 			for (int i = 0; i < word.length(); i++) {
 				total += getHorizontalWordScore(x, y+i, word.charAt(i));
 			}
 
 			/*
-			 * We'll need either a horizontal word or an overlap with an existing vertical word
-			 * in order to score.
+			 * If there were no Horizontal words then we might not be a valid play
 			 */
 			boolean adjacentWords=true;
 			if (total == 0) {
 				adjacentWords = false;
 			}
 
-			//  Add up the word itself
+			/*
+			 * Add up the word itself.  If there are no horizontal words and there is 
+			 * no overlap with a vertical one then this isn't a valid play.
+			 */
 			for (int i = 0; i < word.length(); i++) {
 				if (levels[y+i][x] != 0) {
 					// We're overlapping with an existing tile
@@ -156,10 +178,13 @@ public class UpBoard {
 				total += 1;  // add one for the new tile
 			}
 
+			/*
+			 * If adjacentWords is still false then we don't have a valid word.
+			 */
 			if (!adjacentWords) {
 				total = 0;
 			} else {
-				System.out.println("(" + y + ", " + x + ")   " + word + "    " + total);
+				//System.out.println("(" + y + ", " + x + ")   " + word + "    " + total);
 			}
 
 		}

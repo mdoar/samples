@@ -14,6 +14,11 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+/** Convert an image of an Upwords board into text in a 2D array
+ * 
+ * @author tkolar
+ *
+ */
 public class UpBoardScan {
 
 	BufferedImage img = null;
@@ -25,11 +30,13 @@ public class UpBoardScan {
 	int TOP_OF_IMAGE = 267;
 	
 	/*
-	 * Arbitrarily large number to represent grey saces
+	 * Arbitrarily large number to represent grey spaces
 	 */
 	static int GREY_TILE = 12000;
+	
+	
 	/*
-	 * Determine if three integers are within limit of each other
+	 * Determine if three integers are within 'limit' of one another
 	 */
 	private static boolean numbersClose(int first, int second, int third, int limit) {
 		if (Math.abs(first - second) > limit) {
@@ -88,11 +95,16 @@ public class UpBoardScan {
 					sampledIsBlack = true;
 				}
 				
+				/*
+				 * If the pixel is black in both images, white it out in the created 
+				 * image.  This makes it easy to visually inspect the overlap.
+				 */
 				if (createdIsBlack && sampledIsBlack) {
 					created.setRGB(x, y, 0xffffffff);
 					bothBlack += 1;
 				} else		
 				if ((sampledIsBlack) || createdIsBlack) {
+					// It they aren't both set but one of them is, that would be an XOR
 					xorBlack++;
 				}
 			}
@@ -100,7 +112,6 @@ public class UpBoardScan {
 		if (logging) {
 			System.out.println("blackCount =" + blackCount);
 		}
-		
 		
 		//System.out.println("blackCount =" + blackCount);
 		return(xorBlack/bothBlack);
@@ -161,12 +172,18 @@ public class UpBoardScan {
 		return(false);
 	}
 	
+	/** Use the given image to create a filled in UpBoard
+	 * 
+	 */
    public UpBoard scanBoardFromImage() {
 	   JFrame f = new JFrame("Load Image Sample");
 	   Container content = f.getContentPane();
 	   content.setLayout(new FlowLayout());
 
 
+	   /*
+	    * Add a window so we can see the images when we're debugging them.
+	    */
 	   f.addWindowListener(new WindowAdapter(){
 		   public void windowClosing(WindowEvent e) {
 			   System.exit(0);
@@ -215,11 +232,15 @@ public class UpBoardScan {
 				   tilesMatch = compareTiles(numberTile.img, scanImg, MIN_MATCH_RATIO, false);
 				   if (tilesMatch) {
 					   board.levels[x][y] = level;
+					   // print the stack level to the console for visual confirmation
+					   // that we're reading correctly.
 					   System.out.print(" " + numberTile.character);
 					   break;
 				   } 
 			   }
 			   if (!tilesMatch) {
+				   // print the stack level to the console for visual confirmation
+				   // that we're reading correctly.
 				   System.out.print(" 0");   
 			   }
 		   }
@@ -265,16 +286,22 @@ public class UpBoardScan {
 				   }
 			   }
 			   board.letters[x][y] = probableLetter;
+			   // print the letter to the console for visual confirmation
+			   // that we're reading correctly.
 			   System.out.print(" " + probableLetter);
 		   }
+		   // print the letter to the console for visual confirmation
+		   // that we're reading correctly.
 		   System.out.println("");
 	   }	
 	   return(board);
 	}
 
-	
-	public BufferedImage getTile(int xtile, int ytile) {
-		BufferedImage tile = img.getSubimage(LEFT_OF_IMAGE+xtile*TILE_WIDTH, TOP_OF_IMAGE+ytile*TILE_HEIGHT,
+	/*
+	 * Return the image of the tile in space x,y
+	 */
+	private BufferedImage getTile(int x, int y) {
+		BufferedImage tile = img.getSubimage(LEFT_OF_IMAGE+x*TILE_WIDTH, TOP_OF_IMAGE+y*TILE_HEIGHT,
 											 TILE_WIDTH, STACK_HEIGHT);
 		return(tile);
 	}
